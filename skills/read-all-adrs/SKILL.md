@@ -6,4 +6,4 @@ disable-model-invocation: true
 
 Read every ADR `.md` file in this project's `docs/adr/` folder from start to finish.
 
-Do not summarize from filenames or partial excerpts. Read each ADR file in full before using the context.
+Do not skim or sample. Read each ADR file in full before proceeding.

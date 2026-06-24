@@ -5,27 +5,27 @@ description: Use whenever the user needs the transcript of a YouTube video — f
 
 # YouTube Transcript (via yt-dlp)
 
-Fetch a YouTube video's captions (no video download) and save a clean raw `.txt` transcript.
+Fetch a YouTube video's captions without downloading the video, then save a clean raw `.txt` transcript.
 
 ## Save location
-- If the user is in a real project/working dir → save there.
-- Otherwise (no dir given, or cwd makes no sense) → save to a generic downloads/output directory.
+- If the user is in a real project or working directory, save there.
+- Otherwise, ask the user where to save the transcript or use a generic downloads/output directory.
 
 ## Fastest path
 
 ```bash
-OUT="$(pwd)"            # or a generic downloads/output directory if cwd makes no sense
+OUT="$(pwd)"
 META=$(yt-dlp --print "%(channel)s|%(title)s" --skip-download "URL")
-NAME=$(echo "$META" | tr '| ' '__' | tr -cd '[:alnum:]_.-')   # "Channel_Title", spaces -> _, strip unsafe chars
+NAME=$(echo "$META" | tr '| ' '__' | tr -cd '[:alnum:]_.-')
 yt-dlp --skip-download --write-subs --write-auto-subs \
   --sub-langs "en.*" --sub-format json3 \
   -o "$OUT/$NAME.%(ext)s" "URL"
 ```
 
-**Always name the file `Channel_Title` with spaces replaced by `_`** (e.g. `Example_Channel_title_of_video.txt`). Fall back `channel` → `uploader` → `uploader_id` if `channel` is null.
+Name the file `Channel_Title` with spaces replaced by `_`, for example `Example_Channel_example_video_title.txt`. Fall back `channel` → `uploader` → `uploader_id` if `channel` is null.
 
-- `--skip-download` = captions only. `--write-subs` + `--write-auto-subs` = manual first, auto as fallback (yt-dlp prefers manual automatically).
-- **Always use `json3`, never VTT/SRT** — auto VTT repeats every line twice (rolling captions). json3 is clean structured JSON.
+- `--skip-download` = captions only. `--write-subs` + `--write-auto-subs` = manual first, auto as fallback.
+- Use `json3` rather than VTT/SRT when possible, because auto-generated VTT can contain repeated rolling-caption lines.
 
 ## Flatten json3 → raw text
 
@@ -42,14 +42,14 @@ out.write_text(txt, encoding="utf-8"); print(out)
 PY
 ```
 
-Output: `Channel_Title.txt` in the chosen dir. Report the path; print the text if short.
+Report the saved path and print the text if it is short.
 
 ## Notes
-- Non-English / unknown language: run `yt-dlp --list-subs "URL"` first, then set `--sub-langs`.
-- Newer yt-dlp may need `deno` on PATH for YouTube extraction.
+- Non-English or unknown language: run `yt-dlp --list-subs "URL"` first, then set `--sub-langs`.
+- Newer `yt-dlp` versions may require compatible runtime dependencies for YouTube extraction.
 
 ## Failure handling
 - On first failure: run `yt-dlp -U` once, retry once, then stop.
-- **429 / "Sign in to confirm you're not a bot"** = IP flagged. STOP — do NOT retry in a loop (makes it worse).
-- Empty / "no subtitles" = video has no captions. Report it; don't retry, don't switch tools.
-- Never fall back to downloading audio for Whisper unless the user explicitly asks.
+- `429` or `Sign in to confirm you're not a bot` means access is being rate-limited or challenged. Stop and do not retry in a loop.
+- Empty or `no subtitles` means the video has no captions. Report it; do not retry or switch tools automatically.
+- Never fall back to downloading audio for transcription unless the user explicitly asks.

@@ -1,40 +1,33 @@
 ---
 name: startup-idea-brainstorming
-description: Use when adding new startup ideas to a generic IDEAS.md list. Triggers on "add an idea", "new startup idea", "put this in ideas.md".
+description: Use when the user wants to add new startup ideas to an IDEAS.md list. Triggers on "add an idea", "new startup idea", "put this in ideas.md".
 ---
 
 # Startup Idea Brainstorming
 
-Add new startup ideas to an idea list.
+Add new startup ideas to the user's idea list.
 
 File: `IDEAS.md`
 
-## Target customer profile
+## Target audience
 
-Prioritize startup ideas aimed at buyers with clear budgets and low expected churn, such as:
+Focus ideas on buyers with real budget and lower churn, such as prosumers, small businesses, SMBs, and larger businesses.
 
-- Prosumers and professional users
-- Small businesses and SMBs
-- Larger businesses and teams
-
-Avoid framing ideas around casual hobbyists, free-tier users, or people experimenting purely for fun unless explicitly requested.
+- Do not prioritize hobbyists or people building casually for fun.
+- Frame ideas, problems, questions, and assumptions around paying buyers rather than casual/free-tier users.
 
 ## Process
 
-1. Append the new idea to the end of the numbered list, continuing the numbering.
-2. Do not add to any discarded-ideas section unless explicitly requested.
-3. Write the idea as concisely as possible, preserving the user's phrasing.
-4. Do not add extra framing, ROI claims, or criteria reasoning unless requested.
-5. When done, offer to commit changes if that matches the repository workflow.
+1. Append the new idea to the end of the numbered list, continuing the numbering. Do not add to any discarded-ideas section.
+2. Write it as concisely as possible, using the user's phrasing. One line. Do not add extra framing, ROI claims, or criteria reasoning unless requested.
+3. When done, offer to commit and push if that is part of the repository workflow.
 
 ## Generating new ideas
 
-A useful research prompt format:
+Example research prompt:
 
-> What problems are AI-first companies having?
+> What problems are AI-first companies having? What problems are cutting-edge agentic engineering teams having?
 >
-> What problems are teams building agentic engineering workflows having?
+> Focus on teams with meaningful AI/tooling budgets.
 >
-> Focus on organizations already spending significant budget on AI tools or infrastructure.
->
-> Research and list the biggest recurring problems, especially those tied to urgent business needs and willingness to pay.
+> Do research and provide a list of the biggest problems.

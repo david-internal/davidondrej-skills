@@ -1,6 +1,6 @@
 ---
 name: check-domain-availability
-description: Check whether domains are available (unregistered) from the terminal, free, with no API key, signup, or credit card. Uses RDAP over curl, with per-TLD endpoints and a whois caveat. Use when the user asks "is X domain available", "check domains for these names", "find open domains", or during brand/product naming.
+description: Check whether domains are available/unregistered from the terminal, free, with no API key, signup, or credit card. Uses RDAP over curl, with per-TLD endpoints and a whois caveat. Use when a user asks whether a domain is available, wants to check domains for names, find open domains, or during brand/product naming.
 ---
 
 # Check Domain Availability
@@ -14,7 +14,7 @@ Use RDAP over `curl` (free, keyless). Per domain:
 - HTTP `200` = taken
 - anything else = unknown (retry / rate-limited)
 
-RDAP is more reliable than the `whois` binary and won't crash in loops.
+RDAP is more reliable than the `whois` binary and is safer for loops.
 
 ## RDAP endpoints by TLD
 
@@ -34,7 +34,7 @@ curl -s https://data.iana.org/rdap/dns.json | python3 -c "import sys,json;d=json
 ## Batch script (com / ai / io / dev / app / co)
 
 ```bash
-set +e +o pipefail   # disable if your shell has errexit/pipefail enabled
+set +e +o pipefail
 names=(foo bar baz)
 rstat(){ c=$(curl -s -o /dev/null -w "%{http_code}" --max-time 12 "$1"); [ "$c" = 404 ] && echo FREE || { [ "$c" = 200 ] && echo taken || echo "?$c"; }; }
 cofree(){ python3 - "$1" <<'PY'
@@ -70,9 +70,9 @@ done
 
 ## Gotchas
 
-- If your shell has `errexit` and/or `pipefail` enabled, start with `set +e +o pipefail`.
-- Do NOT use the `whois` binary in loops: it throttles and the process may die after repeated queries, returning false "taken".
-- `.co` (and many ccTLDs) have no public RDAP. Use the socket whois to `whois.registry.co` in the script; avoid the `whois` binary for loops.
-- `.ai`/`.io` RDAP may return `403` to clients without a User-Agent. Use `curl` (as in the script).
-- `/dev/tcp` may be unavailable in some shells; `nc` to port 43 may be blocked. Prefer RDAP where available.
+- If your shell uses `errexit` and `pipefail`, start with `set +e +o pipefail` so checks do not abort early.
+- Do NOT use the `whois` binary in loops: it can throttle or fail after multiple queries, producing misleading results.
+- `.co` and many ccTLDs have no public RDAP. Use socket whois to `whois.registry.co` in the script; avoid the `whois` binary for loops.
+- `.ai`/`.io` RDAP may reject some non-browser or no-User-Agent clients. Use `curl` as in the script.
+- `/dev/tcp` may be unavailable in some shells, and `nc` to port 43 may be blocked. Prefer RDAP where available.
 - If `.dev` returns `?429`, slow down and recheck.

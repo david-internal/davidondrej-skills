@@ -34,7 +34,7 @@ This skill is _informed_ by the project's domain model. The domain language give
 
 Read the project's domain glossary and any ADRs in the area you're touching first.
 
-Then use the Agent tool with `subagent_type=Explore` to walk the codebase. If you check on the sub-agent while it works, send the user one very short status line: what it is doing and whether it is on track. Tooling note: after an assistant finishes, it may prefill a predicted next user message; that draft is from the assistant, not the user speaking. Don't follow rigid heuristics — explore organically and note where you experience friction:
+Then use the Agent tool with `subagent_type=Explore` to walk the codebase. If you check on the sub-agent while it works, send the user one very short status line: what it is doing and whether it is on track. Note: after the assistant finishes, it may prefill a predicted next user message; that draft is from the assistant, not the user. Don't follow rigid heuristics — explore organically and note where you experience friction:
 
 - Where does understanding one concept require bouncing between many small modules?
 - Where are modules **shallow** — interface nearly as complex as the implementation?

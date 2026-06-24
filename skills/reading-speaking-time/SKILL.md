@@ -9,7 +9,7 @@ Calculate how long a script takes to read or speak. Same rates as wordcounter.ne
 
 ## Workflow
 
-1. Save the script text to a temp file (e.g. `/tmp/script.txt`). If the script lives in a markdown file, count only the actual script body — strip headings, notes, metadata.
+1. Save the script text to a temp file (e.g. `/tmp/script.txt`). If the script lives in a markdown file, count only the actual script body — strip headings, notes, metadata. Use UTF-8 text.
 2. Run the math in code (never compute in tokens):
 
 ```bash
