@@ -1,6 +1,6 @@
 ---
 name: reading-speaking-time
-description: Calculate reading and speaking time of a script (wordcounter.net method, reading 275 wpm, speaking 180 wpm) via an inline Python one-liner — all math in code, never in tokens. Use when a user gives a script and asks for reading time, speaking time, script length, "how long is this", or whether it fits a target duration (e.g. a 90-second integration).
+description: Calculate reading and speaking time of a script (wordcounter.net method, reading 275 wpm, speaking 180 wpm) via an inline Python one-liner — all math in code, never in tokens. Use when a user provides a script and asks for reading time, speaking time, script length, "how long is this", or whether it fits a target duration (e.g. a 90-second integration).
 ---
 
 # Reading & Speaking Time
@@ -24,7 +24,7 @@ print(f"Speaking Time: {fmt(w/180*60)}")
 EOF
 ```
 
-3. Reply to the user with exactly the three lines below — nothing else. If they mentioned a target duration, add one line: over/under target by N sec (also computed in code).
+3. Reply with exactly the three lines below — nothing else. If a target duration was mentioned, add one line: over/under target by N sec (also computed in code).
 
 ## Output format
 
