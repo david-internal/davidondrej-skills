@@ -1,6 +1,6 @@
 ---
 name: reading-speaking-time
-description: Calculate reading and speaking time of a script (wordcounter.net method, reading 275 wpm, speaking 180 wpm) via an inline Python one-liner — all math in code, never in tokens. Use when a user gives a script and asks for reading time, speaking time, script length, "how long is this", or whether it fits a target duration (e.g. a 90-second integration).
+description: Calculate reading and speaking time of a script (wordcounter.net method, reading 275 wpm, speaking 180 wpm) via an inline Python one-liner — all math in code, never in tokens. Use when the user gives a script and asks for reading time, speaking time, script length, "how long is this", or whether it fits a target duration.
 ---
 
 # Reading & Speaking Time
@@ -9,7 +9,7 @@ Calculate how long a script takes to read or speak. Same rates as wordcounter.ne
 
 ## Workflow
 
-1. Save the script text to a temp file (e.g. `/tmp/script.txt`). If the script lives in a markdown file, count only the actual script body — strip headings, notes, metadata. Use UTF-8 text.
+1. Save the script text to a temp file (e.g. `/tmp/script.txt`). If the script lives in a markdown file, count only the actual script body — strip headings, notes, metadata.
 2. Run the math in code (never compute in tokens):
 
 ```bash
