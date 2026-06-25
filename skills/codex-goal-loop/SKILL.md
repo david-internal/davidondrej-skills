@@ -7,7 +7,7 @@ description: Explain and write effective instructions for OpenAI Codex's `/goal`
 
 ## What `/goal` is
 
-`/goal` is a slash command in **Codex v0.128.0+** that turns a Codex prompt into a **persistent agent** looping `plan → act → test → review → iterate` until a stop condition is met, the user pauses, or the token budget runs out.
+`/goal` is a slash command in Codex that turns a Codex prompt into a **persistent agent** looping `plan → act → test → review → iterate` until a stop condition is met, the user pauses, or the token budget runs out.
 
 Key difference from a normal prompt: when a turn ends but the goal isn't met, Codex **auto-continues** instead of waiting for input.
 
@@ -19,9 +19,9 @@ When monitoring a running `/goal`, every check should include a one-line update 
 
 ## Requirements
 
-- Codex CLI/app/extension v0.128.0+
-- `goals = true` in `~/.codex/config.toml` (or `codex features enable goals`)
-- **ChatGPT auth** (Plus/Pro/Business/Edu/Enterprise) — API-key auth does **not** work. Pro is the realistic minimum for long runs.
+- A Codex CLI/app/extension version that supports `/goal`
+- `goals = true` in the Codex config, or enable the goals feature through the documented Codex feature command
+- Supported ChatGPT authentication for goal runs; API-key auth may not support this mode
 
 ## When to use it
 
@@ -84,7 +84,7 @@ When the user wants a quick `/goal` instruction, produce a structured markdown b
 - **One objective, one stop condition.** Not a backlog.
 - **Documentation is mandatory.** Every `/goal` prompt must include a single sentence committing the agent to concise, targeted docs — new `.md` files or focused updates to existing docs.
 - **Forbid reward-hacking explicitly:** "Do not delete, skip, weaken, or narrow tests to make the goal pass." Otherwise Codex may game the stop condition.
-- **4,000-char limit** on the objective. If longer, put detail in a file (`PLAN.md`/`GOAL_BRIEF.md`) and make the goal point to it — keep the goal itself compact.
+- **4,000-char limit** on the objective. If longer, put detail in a generic planning file and make the goal point to it — keep the goal itself compact.
 - Use **literal strings** for paths, commands, issue numbers — exact.
 - Forbid scope creep explicitly: "Do not refactor unrelated code. Do not add dependencies."
 - Tell Codex when to pause: "If <condition>, pause and ask before proceeding."
@@ -92,23 +92,21 @@ When the user wants a quick `/goal` instruction, produce a structured markdown b
 
 ### Meta-prompting trick (highest-leverage)
 
-Hand-written goals under-specify. Ask a second AI session with the codebase loaded to: (1) inspect the codebase, (2) surface hidden assumptions/constraints/edge cases, (3) emit a structured `/goal` markdown block using the contract. Paste that into Codex. This can produce significantly better runs.
+Hand-written goals under-specify. Ask a second AI session with the codebase loaded to: (1) inspect the codebase, (2) surface hidden assumptions/constraints/edge cases, (3) emit a structured `/goal` markdown block using the contract. Paste that into Codex. This can produce much better runs.
 
-If an assistant pre-fills a predicted next user message after finishing, treat that draft as assistant output, not as the user's instruction.
+Note: some assistants may prefill a predicted next user message after finishing; treat that draft as assistant-generated, not user intent.
 
 ### Self-goal setting
 
-Codex can now write and set its own goal natively (the `create_goal` tool). Instead of crafting the contract yourself, give it your high-level intent and tell it to set the goal: "Inspect this repo, then write yourself a `/goal` with a verifiable stop condition and pursue it." It's the meta-prompting trick done inline — the agent turns your intent into the contract. Still give it the same raw materials (files to read, constraints, the validation command) so the goal it writes is grounded. Add: "ask clarifying questions before committing if the intent is underspecified" — catches ambiguity up front and prevents the self-set goal from drifting.
+Codex may be able to write and set its own goal natively if the installed version supports that capability. Instead of crafting the contract yourself, give it your high-level intent and tell it to set the goal: "Inspect this repo, then write yourself a `/goal` with a verifiable stop condition and pursue it." It's the meta-prompting trick done inline — the agent turns your intent into the contract. Still give it the same raw materials (files to read, constraints, the validation command) so the goal it writes is grounded. Add: "ask clarifying questions before committing if the intent is underspecified" — catches ambiguity up front and prevents the self-set goal from drifting.
 
 ## Launching
 
 1. `cd <repo>` (goals run scoped to the working directory).
 2. Run `codex` (bare — opens TUI). **Not** `codex exec "/goal ..."` — `/goal` is a TUI slash command only.
-3. Sign in with ChatGPT (not API key).
+3. Sign in with supported authentication.
 4. Type `/goal <your contract>` in the composer, Enter.
 5. Walk away.
-
-Always launch on a branch or worktree. Never on `main`.
 
 ## Controlling a running goal
 
@@ -116,20 +114,20 @@ Always launch on a branch or worktree. Never on `main`.
 |---|---|
 | `/goal` (alone) | Status: current checkpoint, what's verified, what remains, blockers |
 | `/goal pause` | Freeze |
-| `/goal resume` | Unfreeze (required in v0.129+; paused goals never auto-resume) |
+| `/goal resume` | Unfreeze |
 | `/goal clear` | Kill the goal |
 | `/goal <new>` | Replace the current goal |
 | Ctrl+C / any typed message | Auto-pauses; user input always wins priority |
 
-Resuming across sessions: goal state is persisted server-side. `cd` back into the repo, run `codex`, `/goal` for status, `/goal resume`.
+Resuming across sessions: if goal state is persisted by the tool, return to the repo, run `codex`, check `/goal` status, then use `/goal resume` if appropriate.
 
-Budget-limited state: Codex doesn't stop abruptly — it summarizes, notes what's left, saves state. `/goal resume` works after budget refresh or upgrade.
+Budget-limited state: Codex should summarize, note what's left, and save state when supported. Resume after budget refresh or by tightening scope.
 
 ## When a goal drifts
 
 - **Minor drift:** just type a correction in the composer (auto-pauses, folds it in, resumes).
 - **Loose objective:** `/goal pause`, read status, then `/goal <tighter version>` — replaces the contract. Don't pile instructions on a vague goal.
-- **Bad mess:** `/goal clear`, `git status` or `git stash`, rewrite with the meta-prompting trick, restart.
+- **Bad mess:** `/goal clear`, check version control status or stash changes, rewrite with the meta-prompting trick, restart.
 
 Don't let a drifting goal keep running "to see where it goes." Tokens burn, diffs compound.
 
@@ -137,7 +135,7 @@ Don't let a drifting goal keep running "to see where it goes." Tokens burn, diff
 
 - Inspect status periodically with bare `/goal`.
 - **Always review the diff** before merging — long autonomy means more code to validate, not less. Human oversight becomes more critical, not optional.
-- Keep approvals/sandboxing tight; default permissions are correct.
+- Keep approvals/sandboxing tight; default permissions are usually correct.
 - First run: pick a 30-min scoped task so you learn how `/goal` actually stops before trusting it overnight.
 - Bake recurring policy into `AGENTS.md` so every goal inherits it without restating: adversarial self-review before declaring done, an extra QA pass even when tests pass, and the standard validation command. Saves repeating it in each goal paragraph.
 
@@ -145,11 +143,11 @@ Don't let a drifting goal keep running "to see where it goes." Tokens burn, diff
 
 | Symptom | Fix |
 |---|---|
-| `/goal` missing from slash popup | `codex update` (need ≥0.128.0) |
+| `/goal` missing from slash popup | Update Codex to a version that supports `/goal` |
 | Flag on but command missing | Quit and restart `codex` fully |
 | Typed `/goals` | It's singular: `/goal` |
-| Doesn't activate | Sign out, sign back in with ChatGPT subscription (not API key) |
-| Stopped with progress summary | Budget-limited — `/goal resume` after refresh, or tighten scope |
+| Doesn't activate | Verify you are signed in with supported authentication |
+| Stopped with progress summary | Budget-limited — resume after refresh, or tighten scope |
 | `/goal resume` says no active goal | Terminal state or cleared — start fresh with `/goal <new>` |
 | Goal looks active but won't auto-continue | Stuck in Plan mode — plan-only work doesn't trigger continuation. Draft the plan, then switch to Goal execution |
 
